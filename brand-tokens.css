@@ -1,0 +1,136 @@
+:root {
+  --nemesis-blue: #2979ff;
+  --nemesis-blue-bright: #5393ff;
+  --aurora-base: #00c2a8;
+  --aurora-flare: #00e5c8;
+  --accent-color: var(--nemesis-blue);
+  --accent-hover: var(--nemesis-blue-bright);
+  --accent-glow: rgba(41, 121, 255, 0.14);
+  --nemesis-black: #0a0e27;
+  --nemesis-white: #F4F4F4;
+  --text-color: var(--nemesis-white);
+  --text-muted: rgba(244, 244, 244, 0.65);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --theme-border-radius: 12px;
+  --ui-radius: var(--theme-border-radius);
+  --space-xs: 6px;
+  --space-sm: 12px;
+  --space-md: 20px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+  --content-width: 1080px;
+  --page-background: #0a0e27;
+  --page-glow: radial-gradient(circle at 20% 20%, rgba(41, 121, 255, 0.28) 0%, transparent 42%), radial-gradient(circle at 80% 10%, rgba(0, 194, 168, 0.22) 0%, transparent 45%), radial-gradient(circle at 60% 80%, rgba(41, 121, 255, 0.18) 0%, transparent 55%);
+}
+
+body[data-theme="light"] {
+  --text-color: var(--nemesis-black);
+  --text-muted: rgba(26, 26, 26, 0.75);
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(0, 0, 0, 0.12);
+  --page-background: linear-gradient(180deg, #f0f4f8 0%, #e2e8f0 100%);
+  --page-glow: radial-gradient(circle at 20% 15%, rgba(41, 121, 255, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 85%, rgba(0, 194, 168, 0.24) 0%, transparent 50%);
+}
+
+/* Button Styles */
+.btn-primary,
+.btn-ghost,
+.btn-aurora {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 26px;
+  border-radius: var(--ui-radius);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, var(--nemesis-blue) 0%, var(--aurora-base) 100%);
+  color: var(--nemesis-black);
+  border: 2px solid transparent;
+  box-shadow: 0 12px 32px rgba(41, 121, 255, 0.32);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(41, 121, 255, 0.4);
+  color: var(--nemesis-black);
+}
+
+.btn-ghost {
+  :root {
+    --chatgpt-green: #10a37f;
+    --chatgpt-green-light: #43e7b6;
+    --chatgpt-gray: #343541;
+    --chatgpt-gray-light: #444654;
+    --chatgpt-gray-dark: #202123;
+    --chatgpt-user: #2e88ff;
+    --chatgpt-user-bg: #eaf6fb;
+    --nemesis-blue: #2979ff;
+    --nemesis-blue-bright: #5393ff;
+    --aurora-base: #00c2a8;
+    --aurora-flare: #00e5c8;
+    --accent-color: var(--chatgpt-green);
+    --accent-hover: var(--chatgpt-green-light);
+    --accent-glow: rgba(16, 163, 127, 0.14);
+    --nemesis-black: #0a0e27;
+    --nemesis-white: #F4F4F4;
+    --text-color: var(--nemesis-white);
+    --text-muted: rgba(244, 244, 244, 0.65);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --theme-border-radius: 12px;
+    --ui-radius: var(--theme-border-radius);
+    --space-xs: 6px;
+    --space-sm: 12px;
+    --space-md: 20px;
+    --space-lg: 32px;
+    --space-xl: 48px;
+    --content-width: 1080px;
+    --page-background: var(--chatgpt-gray-dark);
+    --page-glow: radial-gradient(circle at 20% 20%, var(--chatgpt-green) 0%, transparent 42%), radial-gradient(circle at 80% 10%, var(--chatgpt-user) 0%, transparent 45%), radial-gradient(circle at 60% 80%, var(--chatgpt-green-light) 0%, transparent 55%);
+  }
+  background: transparent;
+  border: 2px solid var(--glass-border);
+  color: var(--text-color);
+}
+
+body[data-theme="light"] .btn-ghost {
+  border-color: rgba(0, 0, 0, 0.2);
+  color: var(--nemesis-black);
+  body[data-theme="light"] {
+    --text-color: #23263a;
+    --text-muted: #444654;
+    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-border: rgba(0, 0, 0, 0.12);
+    --page-background: #f7f7f8;
+    --page-glow: radial-gradient(circle at 20% 15%, var(--chatgpt-green-light) 0%, transparent 50%), radial-gradient(circle at 80% 85%, var(--chatgpt-user-bg) 0%, transparent 50%);
+  }
+}
+
+.btn-ghost:hover {
+  background: var(--glass-bg);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+.btn-aurora {
+  background: var(--aurora-base);
+  color: var(--nemesis-black);
+  border: 2px solid transparent;
+  box-shadow: 0 12px 32px rgba(0, 194, 168, 0.32);
+}
+
+.btn-aurora:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(0, 194, 168, 0.4);
+  color: var(--nemesis-black);
+}
