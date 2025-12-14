@@ -7,10 +7,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+
+node_modules/
+dist/
+dist-ssr/
 *.local
+.env
+.env.*
+.output/
+.vite/
 
 # Editor directories and files
 .vscode/*
@@ -19,6 +24,25 @@ dist-ssr
 .DS_Store
 *.suo
 *.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# BabbageBox Frontend .gitignore
+models/
+checkpoints/
+weights/
+venv/
+.venv/
+ENV/
+node_modules/
+target/
+build/
+dist/
+*.pt
+*.bin
+*.onnx
+*.safetensors
+*.log
+.DS_Store
+Thumbs.db
+.output/
+.vite/
+.env
+.env.*
