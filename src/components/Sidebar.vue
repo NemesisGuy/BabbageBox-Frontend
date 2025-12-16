@@ -78,17 +78,21 @@ defineEmits(['toggle-sidebar', 'new-chat', 'select-conversation'])
   z-index: 50;
   border-right: 1px solid var(--nav-border);
   background: var(--nav-bg);
-  transition: transform 0.3s ease, width 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    width 0.3s ease;
 }
 
-.sidebar-title, .conversation-text {
+.sidebar-title,
+.conversation-text {
   color: var(--text-main);
 }
 
 .conversation-item {
   color: var(--text-muted);
 }
-.conversation-item:hover, .conversation-item.active {
+.conversation-item:hover,
+.conversation-item.active {
   background: var(--glass-shadow);
   color: var(--text-main);
 }
@@ -152,9 +156,9 @@ defineEmits(['toggle-sidebar', 'new-chat', 'select-conversation'])
     width: 80%;
     max-width: 300px;
     transform: translateX(0);
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
   }
-  
+
   .sidebar.collapsed {
     transform: translateX(-100%);
     width: 0;

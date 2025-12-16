@@ -29,16 +29,12 @@
       />
 
       <Teleport to="body">
-        <div
-          v-if="showModelModal"
-          class="model-modal-overlay"
-          @click.self="showModelModal = false"
-        >
+        <div v-if="showModelModal" class="model-modal-overlay">
           <div class="model-modal glass">
             <button class="modal-close" @click="showModelModal = false">
               <i class="fa-solid fa-xmark"></i>
             </button>
-            <ModelSelector @model-set="() => (showModelModal = false)" />
+            <ModelSelector @model-set="onModelSet" />
           </div>
         </div>
       </Teleport>
@@ -104,6 +100,11 @@ async function fetchConversations() {
   }
 }
 
+async function onModelSet() {
+  await fetchModel()
+  showModelModal.value = false
+}
+
 async function sendMessage() {
   if (!input.value.trim()) return
   const userMsg = {
@@ -115,7 +116,7 @@ async function sendMessage() {
     loading: false,
   }
   messages.value.push(userMsg)
-  
+
   // Push placeholder for assistant response immediately
   const responseMsg = {
     id: Date.now() + Math.random(),
@@ -126,7 +127,7 @@ async function sendMessage() {
     loading: true,
   }
   messages.value.push(responseMsg)
-  
+
   input.value = ''
 
   if (loadingInterval.value) {
@@ -135,17 +136,28 @@ async function sendMessage() {
   }
 
   try {
+    // Build context array: all completed user/assistant turns in order (exclude loading placeholders)
+    const context = messages.value
+      .filter(
+        (m) =>
+          (m.role === 'user' || m.role === 'assistant') &&
+          !m.loading &&
+          m.content.trim() !== ''
+      )
+      .map((m) => ({ role: m.role, content: m.content }))
+
     const res = await fetch('http://localhost:8000/api/process', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text: userMsg.content,
         conversation_id: conversationId.value,
+        context,
         include_tts: ttsEnabled.value,
       }),
     })
     const data = await res.json()
-    
+
     const placeholderIndex = messages.value.length - 1
 
     // Update the placeholder message with the actual response
@@ -155,8 +167,8 @@ async function sendMessage() {
       model: modelName.value,
       content: data.reply || 'No response from LLM.',
       time: new Date().toLocaleTimeString(),
-    };
-    
+    }
+
     if (data.audio_base64 && ttsEnabled.value) {
       playAudio(data.audio_base64)
     } else if (ttsEnabled.value) {
@@ -164,7 +176,9 @@ async function sendMessage() {
     }
   } catch (err) {
     // Find the placeholder and update it to show the error
-    const placeholderIndex = messages.value.findIndex(m => m.id === responseMsg.id);
+    const placeholderIndex = messages.value.findIndex(
+      (m) => m.id === responseMsg.id
+    )
     if (placeholderIndex !== -1) {
       messages.value[placeholderIndex] = {
         ...messages.value[placeholderIndex],
@@ -172,7 +186,7 @@ async function sendMessage() {
         model: 'System',
         content: 'Error: Unable to reach backend.',
         time: new Date().toLocaleTimeString(),
-      };
+      }
     }
     console.error('Message Send Error:', err)
   }
@@ -241,8 +255,6 @@ onMounted(() => {
   )
 })
 
-
-
 const audioPlayer = ref<HTMLAudioElement | null>(null)
 
 function playAudio(base64: string) {
@@ -250,18 +262,18 @@ function playAudio(base64: string) {
     audioPlayer.value.pause()
     audioPlayer.value = null
   }
-  
+
   try {
     const audio = new Audio('data:audio/wav;base64,' + base64)
     audioPlayer.value = audio
-    
+
     audio.oncanplaythrough = () => {
       audio.play().catch((e) => {
         console.error('Audio playback failed:', e)
         alert('TTS Playback Failed: ' + e.message)
       })
     }
-    
+
     audio.onerror = (e) => {
       console.error('Audio load error:', e)
     }

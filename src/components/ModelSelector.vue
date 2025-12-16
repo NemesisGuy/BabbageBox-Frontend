@@ -5,7 +5,6 @@
       id="model-select"
       v-model="selectedModel"
       :disabled="loading || !models.length"
-      @change="setModel"
     >
       <option v-if="loading" disabled>Loading...</option>
       <option v-for="model in models" :key="model" :value="model">
@@ -40,7 +39,7 @@
 import { ref, onMounted } from 'vue'
 const emit = defineEmits(['model-set'])
 
-const BASE = 'http://127.0.0.1:8000'
+const BASE = 'http://localhost:8000'
 const models = ref<string[]>([])
 const selectedModel = ref('')
 const status = ref('')
@@ -59,8 +58,11 @@ async function fetchModels() {
       const configRes = await fetch(`${BASE}/api/config`)
       const configData = await configRes.json()
       const currentModel = configData.llama_model_path
-      if (currentModel && models.value.includes(currentModel)) {
-        selectedModel.value = currentModel
+      const currentFilename = currentModel
+        ? currentModel.split(/[/\\]/).pop()
+        : ''
+      if (currentFilename && models.value.includes(currentFilename)) {
+        selectedModel.value = currentFilename
       } else {
         selectedModel.value = models.value[0] || ''
       }
@@ -91,8 +93,11 @@ async function setModel() {
       const configRes = await fetch(`${BASE}/api/config`)
       const configData = await configRes.json()
       const currentModel = configData.llama_model_path
-      if (currentModel && models.value.includes(currentModel)) {
-        selectedModel.value = currentModel
+      const currentFilename = currentModel
+        ? currentModel.split(/[/\\]/).pop()
+        : ''
+      if (currentFilename && models.value.includes(currentFilename)) {
+        selectedModel.value = currentFilename
       }
     } catch (err) {
       // ignore

@@ -2,8 +2,8 @@
 const props = defineProps({
   status: {
     type: String,
-    default: 'AI is thinking...'
-  }
+    default: 'AI is thinking...',
+  },
 })
 </script>
 
@@ -66,27 +66,44 @@ const props = defineProps({
 .line {
   height: 6px;
   border-radius: 3px;
-  background: linear-gradient(90deg, 
-    rgba(79, 209, 197, 0.2) 0%, 
-    rgba(79, 209, 197, 0.5) 50%, 
+  background: linear-gradient(
+    90deg,
+    rgba(79, 209, 197, 0.2) 0%,
+    rgba(79, 209, 197, 0.5) 50%,
     rgba(79, 209, 197, 0.2) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite linear;
 }
 
-.line.short { width: 60px; }
-.line.medium { width: 120px; }
-.line.long { width: 180px; }
+.line.short {
+  width: 60px;
+}
+.line.medium {
+  width: 120px;
+}
+.line.long {
+  width: 180px;
+}
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Light mode overrides */

@@ -40,7 +40,6 @@
           />
         </div>
       </transition-group>
-      
     </div>
     <div class="chatgpt-tts-controls">
       <canvas
@@ -145,7 +144,6 @@ const props = defineProps({
   showModelModal: { type: Boolean, default: false },
   isThinking: { type: Boolean, default: false },
 })
-
 
 defineEmits([
   'send-message',

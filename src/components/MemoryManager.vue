@@ -18,11 +18,7 @@
       <div v-else-if="filteredMemories.length === 0" class="empty-state">
         No memories found.
       </div>
-      <div
-        v-for="mem in filteredMemories"
-        :key="mem.id"
-        class="memory-item"
-      >
+      <div v-for="mem in filteredMemories" :key="mem.id" class="memory-item">
         <div class="mem-content">
           <div class="mem-header">
             <span class="mem-id">#{{ mem.id }}</span>
@@ -36,7 +32,11 @@
           <button class="btn-ghost" @click="startEdit(mem)" title="Edit">
             <i class="fa-solid fa-pen-to-square"></i>
           </button>
-          <button class="btn-aurora" @click="deleteMemory(mem.id)" title="Delete">
+          <button
+            class="btn-aurora"
+            @click="deleteMemory(mem.id)"
+            title="Delete"
+          >
             <i class="fa-solid fa-trash"></i>
           </button>
         </div>
@@ -45,7 +45,11 @@
 
     <!-- Edit Modal -->
     <Teleport to="body">
-      <div v-if="editingMem" class="model-modal-overlay" @click.self="cancelEdit">
+      <div
+        v-if="editingMem"
+        class="model-modal-overlay"
+        @click.self="cancelEdit"
+      >
         <div class="model-modal glass edit-modal">
           <h3>Edit Memory #{{ editingMem.id }}</h3>
           <textarea
