@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, watch } from 'vue'
+import { API_BASE } from '../config/api'
 import AppSidebar from './AppSidebar.vue'
 import ChatArea from './ChatArea.vue'
 import ModelSelector from './ModelSelector.vue'
@@ -42,14 +43,15 @@ const currentConversationId = ref<number | null>(null) // State for current conv
 
 async function fetchModel() {
   try {
-    const res = await fetch('http://localhost:8000/api/config')
+    const res = await fetch(`${API_BASE}/api/config`)
     const data = await res.json()
     modelName.value = data.current_model || 'Unknown'
     modelId.value = data.current_model || ''
   } catch (e) {
     console.error('Failed to fetch model:', e)
   }
-}
+  }
+
 
 interface Conversation {
   id: number
@@ -58,18 +60,20 @@ interface Conversation {
 }
 
 const conversations = ref<Conversation[]>([])
+
 async function fetchConversations() {
   try {
-    const res = await fetch('http://localhost:8000/api/conversations')
+    const res = await fetch(`${API_BASE}/api/conversations`)
     conversations.value = await res.json()
   } catch (e) {
     console.error('Failed to fetch conversations:', e)
   }
 }
 
+
 async function newChat() {
   try {
-    const res = await fetch('http://localhost:8000/api/conversation/new', {
+    const res = await fetch(`${API_BASE}/api/conversation/new`, {
       method: 'POST',
     })
     const data = await res.json()
@@ -118,7 +122,7 @@ async function sendMessage() {
     }) - 1
 
   try {
-    const res = await fetch('http://localhost:8000/api/process', {
+    const res = await fetch(`${API_BASE}/api/process`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -248,7 +252,7 @@ function toggleRecording() {
         const arrayBuffer = await blob.arrayBuffer()
         const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)))
         try {
-          const res = await fetch('http://localhost:8000/api/transcribe', {
+          const res = await fetch(`${API_BASE}/api/transcribe`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ audio_base64: base64 }),
@@ -265,6 +269,9 @@ function toggleRecording() {
     })
     .catch((err) => console.error('Microphone access denied', err))
 }
+
+// Expose to template
+
 </script>
 
 <template>

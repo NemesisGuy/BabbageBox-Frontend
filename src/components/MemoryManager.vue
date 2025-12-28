@@ -86,10 +86,12 @@ const filteredMemories = computed(() => {
   return memories.value.filter((m) => m.content.toLowerCase().includes(q))
 })
 
+import { API_BASE } from '../config/api'
+
 async function fetchMemories() {
   loading.value = true
   try {
-    const res = await fetch('http://localhost:8000/api/memory')
+    const res = await fetch(`${API_BASE}/api/memory`)
     if (res.ok) {
       memories.value = await res.json()
     }
@@ -103,7 +105,7 @@ async function fetchMemories() {
 async function deleteMemory(id: number) {
   if (!confirm('Are you sure you want to delete this memory?')) return
   try {
-    const res = await fetch(`http://localhost:8000/api/memory/${id}`, {
+    const res = await fetch(`${API_BASE}/api/memory/${id}`, {
       method: 'DELETE',
     })
     if (res.ok) {
@@ -127,14 +129,11 @@ function cancelEdit() {
 async function saveEdit() {
   if (!editingMem.value) return
   try {
-    const res = await fetch(
-      `http://localhost:8000/api/memory/${editingMem.value.id}`,
-      {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: editContent.value }),
-      }
-    )
+    const res = await fetch(`${API_BASE}/api/memory/${editingMem.value.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: editContent.value }),
+    })
     if (res.ok) {
       const updated = await res.json()
       // Update in list

@@ -62,6 +62,8 @@ const providers = ref<string[]>([])
 const loading = ref(false)
 const searched = ref(false)
 
+import { API_BASE } from '../config/api'
+
 async function handleSearch() {
   if (!query.value.trim() || loading.value) return
 
@@ -71,7 +73,7 @@ async function handleSearch() {
   providers.value = []
 
   try {
-    const res = await fetch('http://localhost:8000/api/mcp/search', {
+    const res = await fetch(`${API_BASE}/api/mcp/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: query.value, top_k: 5 }),

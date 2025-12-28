@@ -79,6 +79,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { API_BASE } from '../config/api'
 import SiriWaveform from './SiriWaveform.vue'
 
 const input = ref('')
@@ -97,7 +98,7 @@ async function onSubmit() {
   result.value = ''
 
   try {
-    const resp = await fetch('http://localhost:8000/api/supertonic', {
+    const resp = await fetch(`${API_BASE}/api/supertonic`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

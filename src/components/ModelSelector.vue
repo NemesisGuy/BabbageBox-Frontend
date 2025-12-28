@@ -65,7 +65,7 @@ defineProps<{
 }>()
 const emit = defineEmits(['model-set', 'close', 'model-changed'])
 
-const BASE = 'http://localhost:8000'
+const BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 const models = ref<string[]>([])
 const selectedModel = ref('')
 const status = ref('')

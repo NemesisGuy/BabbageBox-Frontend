@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { API_BASE } from '../config/api'
 
 interface LogEntry {
   timestamp: string
@@ -54,12 +55,11 @@ interface LogEntry {
 
 const logs = ref<LogEntry[]>([])
 const autoRefresh = ref(true)
-const logContainer = ref<HTMLElement | null>(null)
 let timer: ReturnType<typeof setInterval> | null = null
 
 async function fetchLogs() {
   try {
-    const res = await fetch('http://localhost:8000/api/logs')
+    const res = await fetch(`${API_BASE}/api/logs`)
     if (res.ok) {
       logs.value = await res.json()
       await nextTick()
