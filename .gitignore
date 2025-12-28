@@ -46,3 +46,7 @@ Thumbs.db
 .vite/
 .env
 .env.*
+# Test and report files
+test-results/
+playwright-report/
+lint_report.txt

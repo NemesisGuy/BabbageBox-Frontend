@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps({
+defineProps({
   status: {
     type: String,
     default: 'AI is thinking...',

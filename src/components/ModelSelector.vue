@@ -1,43 +1,69 @@
 <template>
-  <div class="model-selector">
-    <label for="model-select">LLM Model</label>
-    <select
-      id="model-select"
-      v-model="selectedModel"
-      :disabled="loading || !models.length"
-    >
-      <option v-if="loading" disabled>Loading...</option>
-      <option v-for="model in models" :key="model" :value="model">
-        {{ model }}
-      </option>
-    </select>
-    <button
-      @click="setModel"
-      class="nemesis-btn nemesis-btn-primary"
-      :disabled="loading || setting || !selectedModel"
-      title="Set Model"
-    >
-      <i class="fa-solid fa-check"></i> Set
-    </button>
-    <button
-      @click="fetchModels"
-      class="nemesis-btn nemesis-btn-model"
-      :disabled="loading"
-      title="Refresh Models"
-      style="margin-left: 4px"
-    >
-      <i class="fa-solid fa-arrows-rotate"></i> Refresh
-    </button>
-    <span class="status">
-      <span v-if="loading">Loading models...</span>
-      <span v-else>{{ status }}</span>
-    </span>
+  <div class="modal-overlay" @click.self="$emit('close')">
+    <div class="model-modal-card nemesis-glass">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-robot"></i> Model Settings</h3>
+        <button class="close-btn" @click="$emit('close')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="model-select">Active Model</label>
+          <div class="select-wrapper">
+            <select
+              id="model-select"
+              v-model="selectedModel"
+              :disabled="loading || !models.length"
+              class="nemesis-select"
+            >
+              <option v-if="loading" disabled>Loading...</option>
+              <option v-for="model in models" :key="model" :value="model">
+                {{ model }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button
+            @click="setModel"
+            class="btn-primary"
+            :disabled="loading || setting || !selectedModel"
+          >
+            <i class="fa-solid fa-check"></i> <span>Apply Changes</span>
+          </button>
+          <button
+            @click="fetchModels"
+            class="btn-ghost"
+            :disabled="loading"
+            title="Refresh list"
+          >
+            <i
+              class="fa-solid fa-arrows-rotate"
+              :class="{ 'fa-spin': loading }"
+            ></i>
+            <span>Refresh</span>
+          </button>
+        </div>
+
+        <div
+          v-if="status"
+          class="status-msg"
+          :class="{ error: status.includes('Error') }"
+        >
+          {{ status }}
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-const emit = defineEmits(['model-set'])
+defineProps<{
+  currentModel: string
+}>()
+const emit = defineEmits(['model-set', 'close', 'model-changed'])
 
 const BASE = 'http://localhost:8000'
 const models = ref<string[]>([])
@@ -68,7 +94,7 @@ async function fetchModels() {
       }
     }
     status.value = models.value.length ? '' : 'No models found.'
-  } catch (err) {
+  } catch {
     models.value = []
     status.value = 'Error loading models'
   } finally {
@@ -99,11 +125,11 @@ async function setModel() {
       if (currentFilename && models.value.includes(currentFilename)) {
         selectedModel.value = currentFilename
       }
-    } catch (err) {
+    } catch {
       // ignore
     }
     emit('model-set', selectedModel.value)
-  } catch (err) {
+  } catch {
     status.value = 'Error setting model'
   } finally {
     setting.value = false
@@ -114,63 +140,141 @@ onMounted(fetchModels)
 </script>
 
 <style scoped>
-.nemesis-btn {
-  display: inline-flex;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
   align-items: center;
-  gap: 8px;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  font-size: 1.05rem;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.model-modal-card {
+  width: 100%;
+  max-width: 450px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-subtle);
+}
+
+.modal-header {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.form-group {
+  margin-bottom: 2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.75rem;
   font-weight: 600;
-  border-radius: 16px;
-  padding: 10px 20px;
+  color: var(--text-primary);
+}
+
+.nemesis-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--nav-pill-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.modal-actions button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--accent-color);
+  color: white;
   border: none;
   cursor: pointer;
-  transition:
-    background 0.18s,
-    color 0.18s,
-    box-shadow 0.18s;
-  box-shadow: 0 2px 8px #4fd1c533;
+  transition: all 0.2s;
 }
-.nemesis-btn-primary {
-  background: linear-gradient(135deg, #4fd1c5 60%, #3182ce 100%);
-  color: #181c2f;
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
 }
-.nemesis-btn-primary:hover {
-  background: linear-gradient(135deg, #63e6be 70%, #4299e1 100%);
-  color: #181c2f;
-}
-.nemesis-btn-model {
-  background: linear-gradient(135deg, #23263a 60%, #4fd1c5 100%);
-  color: #4fd1c5;
-}
-.nemesis-btn-model:hover {
-  background: linear-gradient(135deg, #4fd1c5 70%, #3182ce 100%);
-  color: #181c2f;
-}
-.model-selector {
-  margin-bottom: 1em;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5em;
-}
+
 .btn-ghost {
   background: transparent;
-  border: 1px solid #4fd1c5;
-  color: #4fd1c5;
-  border-radius: 8px;
-  padding: 0.4em 1em;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s;
 }
-.btn-ghost:hover {
-  background: #4fd1c5;
-  color: #23263a;
+
+.status-msg {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--accent-color);
 }
-.status {
-  font-size: 0.95em;
-  color: #4fd1c5;
-  margin-top: 0.2em;
+
+.status-msg.error {
+  color: #ef4444;
+}
+
+.fa-spin {
+  animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
 }
 </style>

@@ -2,13 +2,12 @@
   <div class="memory-manager">
     <div class="manager-header">
       <h3>Memory Management</h3>
-      <div class="search-box sexy-form">
+      <div class="search-box">
         <i class="fa-solid fa-search"></i>
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Search memories..."
-          class="sexy-input"
         />
       </div>
     </div>
@@ -29,11 +28,11 @@
           <p class="mem-text">{{ truncate(mem.content, 120) }}</p>
         </div>
         <div class="mem-actions">
-          <button class="btn-ghost" @click="startEdit(mem)" title="Edit">
+          <button class="btn-icon" @click="startEdit(mem)" title="Edit">
             <i class="fa-solid fa-pen-to-square"></i>
           </button>
           <button
-            class="btn-aurora"
+            class="btn-icon delete"
             @click="deleteMemory(mem.id)"
             title="Delete"
           >
@@ -52,14 +51,10 @@
       >
         <div class="model-modal glass edit-modal">
           <h3>Edit Memory #{{ editingMem.id }}</h3>
-          <textarea
-            v-model="editContent"
-            class="sexy-input edit-area"
-            rows="6"
-          ></textarea>
+          <textarea v-model="editContent" class="edit-area" rows="6"></textarea>
           <div class="modal-actions">
-            <button class="nemesis-btn" @click="cancelEdit">Cancel</button>
-            <button class="nemesis-btn nemesis-btn-primary" @click="saveEdit">
+            <button class="btn-premium" @click="cancelEdit">Cancel</button>
+            <button class="btn-premium btn-premium-primary" @click="saveEdit">
               Save Changes
             </button>
           </div>
@@ -163,20 +158,28 @@ onMounted(fetchMemories)
 
 <style scoped>
 .memory-manager {
-  padding: 24px;
-  max-width: 900px;
+  padding: 1.5rem;
+  max-width: 1000px;
   margin: 0 auto;
-  color: var(--text-main);
-  height: 100%;
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .manager-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.manager-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-color);
 }
 
 .search-box {
@@ -184,11 +187,21 @@ onMounted(fetchMemories)
   align-items: center;
   gap: 10px;
   padding: 8px 16px;
-  width: 300px;
+  width: 100%;
+  max-width: 320px;
+  background: var(--nav-pill-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 99px;
+  transition: all 0.2s;
+}
+
+.search-box:focus-within {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px var(--accent-shadow);
 }
 
 .search-box i {
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .search-box input {
@@ -196,97 +209,203 @@ onMounted(fetchMemories)
   background: transparent;
   padding: 4px;
   width: 100%;
+  color: var(--text-primary);
+  font-size: 0.9rem;
 }
+
 .search-box input:focus {
   outline: none;
-  box-shadow: none;
 }
 
 .memory-list {
   flex: 1;
-  overflow-y: auto;
-  border-radius: 12px;
-  padding: 16px;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1rem;
+  border-radius: 16px;
 }
 
 .empty-state {
-  text-align: center;
-  padding: 40px;
-  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-secondary);
+  opacity: 0.6;
 }
 
 .memory-item {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  transition: background 0.2s;
-  border-radius: 8px;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  transition: all 0.2s;
 }
 
 .memory-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
 }
 
 .mem-content {
   flex: 1;
-  margin-right: 16px;
+  margin-right: 1.5rem;
 }
 
 .mem-header {
   display: flex;
-  gap: 12px;
-  margin-bottom: 6px;
-  font-size: 0.85rem;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
 }
 
 .mem-id {
-  color: #4fd1c5;
-  font-weight: 600;
+  color: var(--accent-color);
+  font-weight: 700;
+  opacity: 0.8;
 }
 
 .mem-time {
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .mem-text {
   font-size: 0.95rem;
-  line-height: 1.4;
-  color: var(--text-main);
+  line-height: 1.5;
+  color: var(--text-primary);
   white-space: pre-wrap;
 }
 
 .mem-actions {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background: var(--nav-pill-hover);
+  color: var(--text-primary);
+}
+
+.btn-icon.delete:hover {
+  background: rgba(245, 101, 101, 0.1);
+  color: #f56565;
+  border-color: #f56565;
+}
+
+/* Modal Overlay matches existing app style */
+.model-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .edit-modal {
-  width: 600px;
+  width: 90%;
+  max-width: 600px;
+  padding: 2rem;
+  border-radius: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1.5rem;
+}
+
+.edit-modal h3 {
+  margin: 0;
+  font-size: 1.25rem;
 }
 
 .edit-area {
   width: 100%;
+  background: var(--nav-pill-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 1rem;
   resize: vertical;
+}
+
+.edit-area:focus {
+  outline: none;
+  border-color: var(--accent-color);
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 1rem;
 }
 
-:global(:root.light) .memory-item:hover {
-  background: rgba(0, 0, 0, 0.02);
+.btn-premium {
+  padding: 8px 20px;
+  border-radius: 99px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border-subtle);
+  background: var(--nav-pill-bg);
+  color: var(--text-primary);
 }
-:global(:root.light) .memory-item {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+.btn-premium-primary {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+  box-shadow: 0 4px 15px var(--accent-shadow);
+}
+
+.btn-premium:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+  .memory-manager {
+    padding: 1rem;
+  }
+  .manager-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .search-box {
+    max-width: 100%;
+  }
+  .memory-item {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .mem-actions {
+    align-self: flex-end;
+  }
 }
 </style>

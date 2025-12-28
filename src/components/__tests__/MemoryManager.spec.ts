@@ -95,7 +95,7 @@ describe('MemoryManager', () => {
       ok: true,
     })
 
-    const deleteBtns = wrapper.findAll('.btn-aurora')
+    const deleteBtns = wrapper.findAll('.btn-icon.delete')
     if (deleteBtns.length === 0) throw new Error('Delete buttons not found')
     await deleteBtns[0].trigger('click')
 
@@ -125,7 +125,8 @@ describe('MemoryManager', () => {
     await flushPromises()
 
     // Open modal
-    const editBtns = wrapper.findAll('.btn-ghost')
+    const editBtns = wrapper.findAll('.btn-icon')
+    // We expect 2 icons per memory (edit, delete), edit is first
     if (editBtns.length === 0) throw new Error('Edit buttons not found')
     await editBtns[0].trigger('click')
 
@@ -145,7 +146,7 @@ describe('MemoryManager', () => {
     await textarea.setValue('Updated content')
 
     // Save
-    await wrapper.find('.nemesis-btn-primary').trigger('click')
+    await wrapper.find('.btn-premium-primary').trigger('click')
     await flushPromises()
 
     expect(fetchMock).toHaveBeenCalledWith(

@@ -9,6 +9,24 @@
       <i class="fa-solid fa-chevron-right"></i>
     </button>
     <div class="sidebar-header">
+      <!-- Profile Selector -->
+      <div v-if="!collapsed" class="profile-selector">
+        <label class="profile-label">Mode</label>
+        <div class="profile-options">
+          <button
+            v-for="profile in CHAT_PROFILES"
+            :key="profile.id"
+            class="profile-btn"
+            :class="{ active: currentProfile === profile.id }"
+            @click="selectProfile(profile.id)"
+            :title="profile.description"
+          >
+            <i class="fa-solid" :class="profile.icon"></i>
+            <span>{{ profile.name }}</span>
+          </button>
+        </div>
+      </div>
+
       <h3 class="sidebar-title">Conversations</h3>
       <button
         v-if="!collapsed"
@@ -59,11 +77,23 @@ interface Conversation {
   title: string | null
   created_at: string
 }
-const props = defineProps<{
+import { CHAT_PROFILES } from '../config/profiles'
+
+defineProps<{
   conversations: Conversation[]
   collapsed: boolean
+  currentProfile: string
 }>()
-defineEmits(['toggle-sidebar', 'new-chat', 'select-conversation'])
+const emit = defineEmits([
+  'toggle-sidebar',
+  'new-chat',
+  'select-conversation',
+  'update:profile',
+])
+
+function selectProfile(profileId: string) {
+  emit('update:profile', profileId)
+}
 </script>
 
 <style scoped>
@@ -73,6 +103,8 @@ defineEmits(['toggle-sidebar', 'new-chat', 'select-conversation'])
   max-width: 320px;
   flex-shrink: 0;
   height: 100vh;
+  position: sticky;
+  top: 0;
   overflow-y: auto;
   box-sizing: border-box;
   z-index: 50;
@@ -146,15 +178,63 @@ defineEmits(['toggle-sidebar', 'new-chat', 'select-conversation'])
   font-size: 16px;
 }
 
+/* Profile Selector Styles */
+.profile-selector {
+  margin-bottom: 6px;
+}
+.profile-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  display: block;
+}
+.profile-options {
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px;
+  border-radius: 8px;
+}
+.profile-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  transition: all 0.2s;
+}
+.profile-btn i {
+  font-size: 1rem;
+}
+.profile-btn.active {
+  background: var(--nav-bg); /* or accent color */
+  color: #4fd1c5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.profile-btn:hover:not(.active) {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .sidebar {
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     bottom: 0;
     width: 80%;
     max-width: 300px;
+    height: 100vh;
     transform: translateX(0);
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
   }

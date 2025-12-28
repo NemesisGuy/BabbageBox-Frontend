@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-main-content">
+  <div class="chat-area-container fluid-width">
     <button
       class="mobile-sidebar-toggle nemesis-btn"
       @click="$emit('toggle-sidebar')"
@@ -7,55 +7,29 @@
     >
       <i class="fa-solid fa-bars"></i>
     </button>
-    <div class="chatgpt-window" ref="chatWindow">
-      <div v-if="!messages.length" class="chatgpt-fallback">
-        No messages yet. Start the conversation!
-      </div>
-      <transition-group name="bubble-fade" tag="div">
-        <div
-          v-for="msg in messages"
-          :key="msg.id"
-          :class="['chatgpt-bubble', msg.role, { thinking: msg.loading }]"
-        >
+    <div class="chat-viewport" ref="chatWindow">
+      <div v-if="!messages.length" class="chat-intro">
+        <div class="intro-card nemesis-glass">
           <img
-            v-if="msg.role === 'assistant'"
-            class="avatar-img"
-            src="/chatgpt-avatar.svg"
-            alt="AI"
+            src="https://brand.nemesisnet.co.za/assets/optimized/Nemesis_Logo_Icon@128.png"
+            alt="Logo"
+            class="intro-logo"
           />
-          <div class="chatgpt-content">
-            <GhostTyper v-if="msg.loading" />
-            <div v-else>
-              <div v-html="msg.content"></div>
-              <div class="chatgpt-meta">
-                {{ msg.role === 'user' ? 'You' : msg.model }} • {{ msg.time }}
-              </div>
-            </div>
-          </div>
-          <img
-            v-if="msg.role === 'user'"
-            class="avatar-img"
-            src="/user-avatar.svg"
-            alt="You"
-          />
+          <h2>How can I help you today?</h2>
         </div>
-      </transition-group>
+      </div>
+      <div class="messages-container">
+        <MessageBubble v-for="msg in messages" :key="msg.id" :msg="msg" />
+      </div>
     </div>
-    <div class="chatgpt-tts-controls">
-      <canvas
-        ref="waveform"
-        width="180"
-        height="36"
-        style="background: transparent; display: none"
-      ></canvas>
-      <button
-        v-if="showSilence"
-        @click="$emit('silence-tts')"
-        class="btn-aurora"
-        title="Silence TTS"
-      >
-        <i class="fa-solid fa-volume-xmark"></i> Silence
-      </button>
+
+    <div class="audio-overlay-zone">
+      <SiriWaveform :active="showSilence" />
+      <AudioControls
+        :audio-player="audioPlayer"
+        :show="showSilence"
+        @close="$emit('silence-tts')"
+      />
     </div>
     <form
       class="chatgpt-form sexy-form"
@@ -99,6 +73,14 @@
       </button>
       <button
         type="button"
+        class="btn-ghost"
+        @click="$emit('show-tts-settings')"
+        title="TTS Settings"
+      >
+        <i class="fa-solid fa-sliders"></i>
+      </button>
+      <button
+        type="button"
         class="btn-primary"
         title="Record Audio"
         @click="$emit('toggle-recording')"
@@ -124,7 +106,9 @@
 
 <script setup lang="ts">
 import type { PropType } from 'vue'
-import GhostTyper from './GhostTyper.vue'
+import MessageBubble from './MessageBubble.vue'
+import SiriWaveform from './SiriWaveform.vue'
+import AudioControls from './AudioControls.vue'
 
 interface Message {
   id: number
@@ -133,12 +117,22 @@ interface Message {
   time: string
   model: string
   loading?: boolean
+  metrics?: {
+    tokens_per_second: number
+    generation_time: number
+    completion_tokens: number
+    is_fallback?: boolean
+  }
 }
 
-const props = defineProps({
+defineProps({
   messages: { type: Array as PropType<Message[]>, required: true },
   input: { type: String, required: true },
   ttsEnabled: { type: Boolean, required: true },
+  audioPlayer: {
+    type: Object as PropType<HTMLAudioElement | null>,
+    default: null,
+  },
   showSilence: { type: Boolean, default: false },
   isRecording: { type: Boolean, default: false },
   showModelModal: { type: Boolean, default: false },
@@ -151,6 +145,7 @@ defineEmits([
   'update:ttsEnabled',
   'silence-tts',
   'show-model-modal',
+  'show-tts-settings',
   'toggle-recording',
   'clear-input',
   'toggle-sidebar',
@@ -158,23 +153,192 @@ defineEmits([
 </script>
 
 <style scoped>
+.chat-area-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  background: var(--bg-primary);
+}
+
+.fluid-width {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.chat-viewport {
+  flex: 1;
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.chat-intro {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intro-card {
+  text-align: center;
+  padding: 3rem;
+  border-radius: 24px;
+  max-width: 500px;
+}
+
+.intro-logo {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 0 20px var(--accent-shadow));
+}
+
+.intro-card h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.chatgpt-form {
+  position: relative;
+  margin: 2rem auto;
+  max-width: 1000px;
+  width: calc(100% - 2rem);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--nav-pill-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+.chatgpt-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0.5rem;
+}
+
+.btn-primary,
+.btn-ghost,
+.btn-aurora {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--accent-color);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--accent-shadow);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--nav-pill-hover);
+  color: var(--text-primary);
+}
+
+.btn-ghost.active {
+  color: var(--accent-color);
+}
+
+.btn-aurora {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.btn-aurora:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.audio-overlay-zone {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 60;
+}
+
+.audio-overlay-zone > * {
+  pointer-events: auto;
+}
+
 .mobile-sidebar-toggle {
   display: none;
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 40;
-  padding: 8px 12px;
-  font-size: 1.2rem;
-  background: var(--nav-bg);
-  border: 1px solid var(--nav-border);
-  color: #4fd1c5;
-  box-shadow: 0 2px 8px var(--glass-shadow);
+  position: fixed;
+  top: 80px; /* Below header */
+  left: 1rem;
+  z-index: 150;
+  background: var(--nav-pill-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mobile-sidebar-toggle:hover {
+  background: var(--nav-pill-hover);
 }
 
 @media (max-width: 768px) {
   .mobile-sidebar-toggle {
-    display: inline-flex;
+    display: flex;
+  }
+
+  .chat-viewport {
+    padding: 1rem;
+    padding-bottom: 120px; /* More space for mobile */
+  }
+
+  .chatgpt-form {
+    width: calc(100% - 2rem);
+    bottom: 30px; /* More space for footer and mobile UI */
   }
 }
 </style>

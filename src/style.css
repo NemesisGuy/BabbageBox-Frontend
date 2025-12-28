@@ -421,6 +421,7 @@ body::before {
   filter: blur(80px);
   z-index: 0;
   transform: translateX(-50%);
+  pointer-events: none;
 }
 
 @keyframes gradientMove {
@@ -721,6 +722,7 @@ textarea::placeholder {
   filter: blur(80px);
   z-index: 0;
   transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .chatgpt-window {
@@ -905,11 +907,8 @@ body,
   color: var(--footer-text);
   border-radius: 0;
   box-shadow: 0 -2px 16px var(--glass-shadow);
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100vw;
-  z-index: 100;
+  /* No fixed positioning - footer flows naturally with content */
+  width: 100%;
 }
 
 /* Prevent anything from rendering under the footer */

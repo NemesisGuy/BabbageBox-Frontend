@@ -3,9 +3,9 @@ import { ref, watch, onMounted } from 'vue'
 import MainChat from './components/MainChat.vue'
 import MemoryManager from './components/MemoryManager.vue'
 import McpSearch from './components/McpSearch.vue'
-import Supertonic from './components/Supertonic.vue'
+import SupertonicPlayground from './components/SupertonicPlayground.vue'
 import LogsViewer from './components/LogsViewer.vue'
-import Footer from './components/Footer.vue'
+import AppFooter from './components/AppFooter.vue'
 
 const view = ref('chat')
 const theme = ref(localStorage.getItem('theme') || 'dark')
@@ -32,225 +32,316 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="babbagebox-app">
-    <nav class="main-nav nemesis-glass">
-      <div class="nav-brand">
-        <img
-          src="https://brand.nemesisnet.co.za/assets/optimized/Nemesis_Logo_Icon@128.png"
-          alt="NemesisNet logo"
-          width="32"
-          height="32"
-        />
-        <span class="brand-title">BabbageBox</span>
+  <div class="babbagebox-app" :class="theme">
+    <nav class="premium-header nemesis-glass">
+      <div class="header-left">
+        <div class="nav-brand">
+          <img
+            src="https://brand.nemesisnet.co.za/assets/optimized/Nemesis_Logo_Icon@128.png"
+            alt="NemesisNet logo"
+            width="32"
+            height="32"
+          />
+          <span class="brand-title">BabbageBox</span>
+        </div>
       </div>
-      <button
-        class="burger-menu lg:hidden"
-        @click="menuOpen = !menuOpen"
-        :aria-expanded="menuOpen"
-        aria-label="Toggle navigation menu"
-      >
-        <i class="fa-solid fa-bars"></i>
-      </button>
-      <ul
-        class="nav-menu hidden md:flex md:flex-row"
-        :class="{ 'flex flex-col': menuOpen }"
-      >
-        <li :class="{ active: view === 'chat' }" @click="setView('chat')">
-          <button class="nemesis-btn nemesis-btn-primary">
-            <i class="fa-solid fa-comments"></i> Chat
-          </button>
-        </li>
-        <li :class="{ active: view === 'memory' }" @click="setView('memory')">
-          <button class="nemesis-btn nemesis-btn-model">
-            <i class="fa-solid fa-brain"></i> Memory
-          </button>
-        </li>
-        <li :class="{ active: view === 'search' }" @click="setView('search')">
-          <button class="nemesis-btn nemesis-btn-primary">
-            <i class="fa-solid fa-magnifying-glass"></i> MCP/Search
-          </button>
-        </li>
-        <li
-          :class="{ active: view === 'supertonic' }"
-          @click="setView('supertonic')"
-        >
-          <button class="nemesis-btn nemesis-btn-model">
-            <i class="fa-solid fa-microphone"></i> Supertonic
-          </button>
-        </li>
-        <li :class="{ active: view === 'logs' }" @click="setView('logs')">
-          <button class="nemesis-btn nemesis-btn-primary">
-            <i class="fa-solid fa-file-lines"></i> Logs
-          </button>
-        </li>
-        <li>
-          <button
-            class="nemesis-btn theme-toggle-btn"
-            @click="toggleTheme"
-            :title="
-              theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
-            "
+
+      <div class="header-center">
+        <ul class="nav-pills hidden md:flex">
+          <li :class="{ active: view === 'chat' }" @click="setView('chat')">
+            <i class="fa-solid fa-comments"></i> <span>Chat</span>
+          </li>
+          <li :class="{ active: view === 'memory' }" @click="setView('memory')">
+            <i class="fa-solid fa-brain"></i> <span>Memory</span>
+          </li>
+          <li :class="{ active: view === 'search' }" @click="setView('search')">
+            <i class="fa-solid fa-magnifying-glass"></i> <span>MCP</span>
+          </li>
+          <li
+            :class="{ active: view === 'supertonic' }"
+            @click="setView('supertonic')"
           >
-            <i v-if="theme === 'dark'" class="fa-solid fa-sun"></i>
-            <i v-else class="fa-solid fa-moon"></i>
-          </button>
-        </li>
-      </ul>
+            <i class="fa-solid fa-microphone"></i> <span>TTS</span>
+          </li>
+          <li :class="{ active: view === 'logs' }" @click="setView('logs')">
+            <i class="fa-solid fa-file-lines"></i> <span>Logs</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="header-right">
+        <button
+          class="nav-icon-btn"
+          @click="toggleTheme"
+          :title="theme === 'dark' ? 'Light Mode' : 'Dark Mode'"
+        >
+          <i v-if="theme === 'dark'" class="fa-solid fa-sun"></i>
+          <i v-else class="fa-solid fa-moon"></i>
+        </button>
+        <button class="burger-menu md:hidden" @click="menuOpen = !menuOpen">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Menu Overlay -->
+      <transition name="fade">
+        <div
+          v-if="menuOpen"
+          class="mobile-menu-overlay"
+          @click="menuOpen = false"
+        >
+          <div class="mobile-menu glass" @click.stop>
+            <li @click="setView('chat')">
+              <i class="fa-solid fa-comments"></i> Chat
+            </li>
+            <li @click="setView('memory')">
+              <i class="fa-solid fa-brain"></i> Memory
+            </li>
+            <li @click="setView('search')">
+              <i class="fa-solid fa-magnifying-glass"></i> Search
+            </li>
+            <li @click="setView('supertonic')">
+              <i class="fa-solid fa-microphone"></i> TTS
+            </li>
+            <li @click="setView('logs')">
+              <i class="fa-solid fa-file-lines"></i> Logs
+            </li>
+          </div>
+        </div>
+      </transition>
     </nav>
-    <main class="main-content">
-      <div v-if="view === 'chat'">
-        <MainChat />
-      </div>
-      <div v-else-if="view === 'memory'">
-        <MemoryManager />
-      </div>
-      <div v-else-if="view === 'search'">
-        <McpSearch />
-      </div>
-      <div v-else-if="view === 'supertonic'">
-        <Supertonic />
-      </div>
-      <div v-else-if="view === 'logs'">
-        <LogsViewer />
+
+    <main class="premium-main">
+      <div class="content-container">
+        <div v-if="view === 'chat'" class="view-item">
+          <MainChat />
+        </div>
+        <div v-else-if="view === 'memory'" class="view-item">
+          <MemoryManager />
+        </div>
+        <div v-else-if="view === 'search'" class="view-item">
+          <McpSearch />
+        </div>
+        <div v-else-if="view === 'supertonic'" class="view-item">
+          <SupertonicPlayground />
+        </div>
+        <div v-else-if="view === 'logs'" class="view-item">
+          <LogsViewer />
+        </div>
       </div>
     </main>
-    <Footer class="nemesis-glass" />
+    <AppFooter />
   </div>
 </template>
 
 <style>
-* {
-  box-sizing: border-box;
-}
 .babbagebox-app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background: linear-gradient(135deg, #23263a 0%, #4fd1c5 100%);
+  min-height: 100vh; /* Use min-height so it can grow */
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background 0.3s ease;
 }
-.main-nav {
-  width: 100%;
-  background: rgba(24, 28, 47, 0.85);
-  box-shadow:
-    0 8px 32px rgba(30, 136, 229, 0.18),
-    0 0 0 1.5px #4fd1c533;
-  backdrop-filter: blur(12px) saturate(1.2);
-  border-bottom: 1.5px solid #4fd1c533;
-  padding: 0.5em 0 0.5em 0;
+
+/* Premium Header */
+.premium-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  height: 64px;
+  z-index: 100;
+  border-bottom: 1px solid var(--border-subtle);
 }
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.header-center {
+  display: flex;
+  justify-content: center;
+  flex: 2;
+}
+
+.header-right {
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 0.7em;
-  font-size: 1.3em;
+  gap: 0.75rem;
   font-weight: 700;
-  color: #4fd1c5;
-  margin-left: 1.2em;
-}
-.brand-title {
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  letter-spacing: 0.04em;
-}
-.theme-toggle-btn {
-  background: transparent;
-  border: none;
-  color: #4fd1c5;
-  font-size: 1.3em;
-  padding: 0.3em 0.7em;
-  border-radius: 50%;
-  transition:
-    background 0.18s,
-    color 0.18s;
-}
-.theme-toggle-btn:hover {
-  background: #4fd1c5;
-  color: #23263a;
-}
-.burger-menu {
-  background: transparent;
-  border: none;
-  color: #4fd1c5;
-  font-size: 1.3em;
-  padding: 0.3em 0.7em;
-  border-radius: 8px;
-  transition:
-    background 0.18s,
-    color 0.18s;
-}
-.burger-menu:hover {
-  background: #4fd1c5;
-  color: #23263a;
-}
-@media (min-width: 1024px) {
-  .burger-menu {
-    display: none;
-  }
-}
-.nav-menu {
-  display: flex;
-  gap: 0.8em;
-  list-style: none;
-  margin: 0 1.2em 0 0;
-  padding: 0;
-}
-.nav-menu.flex {
-  display: flex;
-  flex-direction: column;
-  background: rgba(24, 28, 47, 0.95);
-  backdrop-filter: blur(12px);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  padding: 1em;
-  gap: 0.5em;
+  font-size: 1.25rem;
+  color: var(--accent-color);
 }
 
-/* Smaller nav buttons */
-.main-nav .nemesis-btn {
-  padding: 8px 16px;
-  font-size: 0.9rem;
+/* Nav Pills */
+.nav-pills {
+  display: flex;
+  background: var(--nav-pill-bg);
+  padding: 4px;
+  border-radius: 99px;
+  list-style: none;
+  border: 1px solid var(--border-subtle);
 }
-.nav-menu.flex .nemesis-btn {
-  width: 100%;
-  justify-content: flex-start;
-}
-.nav-menu li {
+
+.nav-pills li {
+  padding: 6px 16px;
+  border-radius: 99px;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5em;
-  font-size: 1.08em;
+  gap: 8px;
+  font-size: 0.9rem;
   font-weight: 500;
-  color: #eaf6fb;
-  padding: 0.3em 0.8em;
-  border-radius: 16px;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.nav-pills li:hover {
+  color: var(--text-primary);
+  background: var(--nav-pill-hover);
+}
+
+.nav-pills li.active {
+  background: var(--accent-color);
+  color: white;
+  box-shadow: 0 2px 10px var(--accent-shadow);
+}
+
+.nav-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
   cursor: pointer;
-  transition:
-    background 0.18s,
-    color 0.18s,
-    box-shadow 0.18s;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
 }
-.nav-menu li.active,
-.nav-menu li:hover {
-  background: linear-gradient(135deg, #4fd1c5 60%, #3182ce 100%);
-  color: #23263a;
-  box-shadow: 0 2px 8px #4fd1c533;
+
+.nav-icon-btn:hover {
+  background: var(--nav-pill-hover);
+  color: var(--text-primary);
 }
-.main-content {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
+
+/* Mobile Menu */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+}
+
+.mobile-menu {
+  position: absolute;
+  top: 70px;
+  right: 1.5rem;
+  min-width: 200px;
+  padding: 1rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  list-style: none;
+}
+
+.mobile-menu li {
+  padding: 12px 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.mobile-menu li:hover {
+  background: var(--nav-pill-hover);
+}
+
+/* Main Content Area */
+.premium-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
+}
+
+.content-container {
+  width: 100%;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  min-height: 0;
+}
+
+.view-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* CSS Variables for Themes */
+:root {
+  --bg-primary: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --border-subtle: #e5e5e5;
+  --nav-pill-bg: #f5f5f5;
+  --nav-pill-hover: #eeeeee;
+  --accent-color: #4fd1c5;
+  --accent-shadow: rgba(79, 209, 197, 0.3);
+}
+
+.dark {
+  --bg-primary: #121421;
+  --text-primary: #ffffff;
+  --text-secondary: #a0aec0;
+  --border-subtle: #2d3748;
+  --nav-pill-bg: #1a202c;
+  --nav-pill-hover: #2d3748;
+  --accent-color: #4fd1c5;
+  --accent-shadow: rgba(79, 209, 197, 0.2);
+}
+
+/* Responsive Helpers */
+@media (min-width: 768px) {
+  .md\:hidden {
+    display: none !important;
+  }
+  .hidden.md\:flex {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .hidden {
+    display: none !important;
+  }
+}
+
+/* Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
