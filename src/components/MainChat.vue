@@ -50,8 +50,7 @@ async function fetchModel() {
   } catch (e) {
     console.error('Failed to fetch model:', e)
   }
-  }
-
+}
 
 interface Conversation {
   id: number
@@ -69,7 +68,6 @@ async function fetchConversations() {
     console.error('Failed to fetch conversations:', e)
   }
 }
-
 
 async function newChat() {
   try {
@@ -271,7 +269,6 @@ function toggleRecording() {
 }
 
 // Expose to template
-
 </script>
 
 <template>
