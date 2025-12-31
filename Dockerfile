@@ -16,5 +16,9 @@ RUN npm run build
 # Use nginx for static file serving
 FROM nginx:alpine as production
 COPY --from=base /app/dist /usr/share/nginx/html
+# Copy entrypoint to generate env.js at runtime
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 EXPOSE 80
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
